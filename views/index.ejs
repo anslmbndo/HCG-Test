@@ -1,0 +1,47 @@
+<H3>
+	<a href="http://localhost:3001/" >Users&nbsp;|</a>
+	<a href="http://localhost:3001/books" >Books</a>
+</h3>
+<h3>Add User</h3>
+<form method="post" action="/users/add">
+	<input type="text" name="userid" placeholder="User ID">
+	<input type="text" name="firstname" placeholder="firstname">
+	<input type="text" name="lastname" placeholder="lastname">
+	<input type="text" name="username" placeholder="username">
+	<input type="text" name="email" placeholder="email">
+	<input type="text" name="admin" placeholder="admin">
+	<input type="submit" value="submit">
+</form>
+<h3>Users</h3>
+<table border="4">
+	<tr>
+		<th>User ID</th>
+		<th>firstname</th>
+		<th>lastname</th>
+		<th>username</th>
+		<th>email</th>
+		<th>admin</th>
+	</tr>
+	<% users.forEach(function(user){ %>
+	<tr>
+		<form method="post" action="/users/update/<%= user.key %>">
+			<td><input type="text" name="userId" value="<%= user.value.userid %>"></td>
+			<td><input type="text" name="firstname" value="<%= user.value.firstname %>"></td>
+			<td><input type="text" name="lastname" value="<%= user.value.lastname %>"></td>
+			<td><input type="text" name="username" value="<%= user.value.username %>"></td>
+			<td><input type="text" name="email" value="<%= user.value.email %>"></td>
+			<td><input type="text" name="admin" value="<%= user.value.admin %>"></td>
+			<td>			
+				<input type="hidden" value="<%= user.value.rev %>" name="rev">
+				<input type="submit" value="Edit">
+			</td>
+		</form>
+		<form method="post" action="/users/delete/<%= user.key %>">
+			<td>			
+				<input type="hidden" value="<%= user.value.rev %>" name="rev">
+				<input type="submit" value="Delete">
+			</td>
+		</form>
+	</tr>
+	<% }); %>
+</table>
