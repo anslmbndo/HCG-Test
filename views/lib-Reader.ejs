@@ -1,9 +1,8 @@
 <!DOCTYPE html> 
 <html> 
 <head> 
-    <title>Admin - Books</title> 
-	
-    <style type="text/css" media="screen">
+    <title>Reader - Main</title> 
+    <style type="text/css" media="screen"> 
 		html{height: 100%;}	
         body { 
             background-image: url("https://258qw92xkl-flywheel.netdna-ssl.com/wp-content/uploads/2018/01/abstract-white-transparent-waves-in-motion-at-the-top-and-bottom-on-gradient-blue-background-loop-animation_4vowt3ocg__F0000.png"); 
@@ -66,18 +65,10 @@
 
 <div id="normalFont">
 <H3>
-	<a href="http://localhost:3001/" >Users&nbsp;|</a>
-	<a href="http://localhost:3001/books" >Books</a>
+	<a href="http://localhost:3001/lib-Reader" >Books&nbsp;|</a>
+		<a href="" >My Books</a>
 </h3>
-<h3>Add Book</h3>
-<form method="post" action="/books/add">
-	<input type="text" name="name" placeholder="Name">
-	<input type="text" name="category" placeholder="Category">
-	<input type="text" name="author" placeholder="Author">
-	<input type="text" name="publishDate" placeholder="Publish Date">
-	<input type="submit" value="submit">
-</form>
-<h3>Books</h3>
+<h3>Browse Books</h3>
 </div>
 <table id="books">
 	<tr>
@@ -87,11 +78,10 @@
 		<th>Author</th>
 		<th>Publish Date</th>
 		<th> </th>
-		<th> </th>
 	</tr>
 	<% books.forEach(function(books){ %>
 	<tr>
-		<form method="post" action="/books/update/<%= books.key %>">
+		<form method="post" action="/books/checkout/<%= books.key %>">
 			<td><input type="text" name="bookId" value="<%= books.value.bookId %>" required></td>
 			<td><input type="text" name="name" value="<%= books.value.name %>" required></td>
 			<td><input type="text" name="category" value="<%= books.value.category %>" required></td>
@@ -99,18 +89,13 @@
 			<td><input type="text" name="publishDate" value="<%= books.value.publishDate %>" required></td>
 			<td>			
 				<input type="hidden" value="<%= books.value.rev %>" name="rev">
-				<input type="submit" value="Edit">
+				<input type="submit" value="Checkout">
 			</td>
 		</form>
-		<form method="post" action="/books/delete/<%= books.key %>">
-			<td>			
-				<input type="hidden" value="<%= books.value.rev %>" name="rev">
-				<input type="submit" value="Delete">
-			</td>
-		</form>
+
 	</tr>
 	<% }); %>
 </table>
 
-<body>
+</body>
 </html>

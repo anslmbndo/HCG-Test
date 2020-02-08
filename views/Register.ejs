@@ -1,8 +1,8 @@
 <!DOCTYPE html> 
 <html> 
 <head> 
-    <title>Welcome!</title> 
-    <style type="text/css" media="screen"> 
+    <title>Registration</title> 
+    <style type="text/css" media="screen">
 		html{height: 100%;}
         body { 
             background-image: url("https://258qw92xkl-flywheel.netdna-ssl.com/wp-content/uploads/2018/01/abstract-white-transparent-waves-in-motion-at-the-top-and-bottom-on-gradient-blue-background-loop-animation_4vowt3ocg__F0000.png"); 
@@ -13,7 +13,7 @@
 			background-size: cover; 
         }
 		input[type=text]{
-			width: 25%;
+			width: 30%;
 			padding: 12px 20px;
 			margin: 8px 0;
 			display: inline-block;
@@ -22,7 +22,7 @@
 			box-sizing: border-box;
 		}
 		input[type=submit] {
-			width: 25%;
+			width: 43%;
 			background-color: #4CAF50;
 			color: white;
 			padding: 14px 20px;
@@ -45,24 +45,31 @@
 			font-style: normal;
 			font-variant: normal;
 			text-transform: none;
-		}		
+		}
     </style> 
 </head> 
 <body>
 
-
 <H3>
 <div id="normalFont">
 	<a href="http://localhost:3001/login" >Login&nbsp;|</a>
-	<a href="http://localhost:3001/Register" >Register</a>
+	<a href="http://localhost:3001/Register" >Registration</a>
 </h3>
 
-<form method="post" action="/login/redirect">
+<form method="post" action="/users/register">
 	<div id="normalFont">
-	<input type="text" name="username" placeholder="Username"><br>
+	<!--<input type="text" name="userid" placeholder="User ID">-->
+	<h4>First Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
+	<input type="text" name="firstname" placeholder="firstname" required><br><br>
+	Last Name Name: <input type="text" name="lastname" placeholder="lastname" required><br><br>
+	Username: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="text" name="username" placeholder="username" required><br><br>
+	Email: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="text" name="email" placeholder="email" required></h4><br>
 	<input type="submit" value="submit">
 	</div>
 </form>
 </div>
+
 </body>
 </html>

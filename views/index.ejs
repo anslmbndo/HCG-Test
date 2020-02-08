@@ -1,36 +1,134 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>Admin - Users</title> 
+    <style type="text/css" media="screen">
+		html{height: 100%;}	
+        body { 
+            background-image: url("https://258qw92xkl-flywheel.netdna-ssl.com/wp-content/uploads/2018/01/abstract-white-transparent-waves-in-motion-at-the-top-and-bottom-on-gradient-blue-background-loop-animation_4vowt3ocg__F0000.png"); 
+            text-decoration-color: white; 
+			height: 100%;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+            <!--font-size:1em;-->  
+        }
+		input,select {
+			padding: 12px;
+			margin: 8px 0;
+			box-sizing: border-box;
+			border: none;
+			background-color: #299191;
+			color: white;
+			opacity: 0.8;
+		}
+		#normalFont {
+			font-family: "Times New Roman", Times, serif;
+			font-size: 25px;
+			letter-spacing: -1.2px;
+			word-spacing: 0.4px;
+			color: #0D0954;
+			font-weight: 700;
+			font-style: normal;
+			font-variant: normal;
+			text-transform: none;
+		}
+		::placeholder {
+			color: #c9c4c3;
+		}
+		#userstbl {
+			font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		#userstbl td, #userstbl th {
+			border: 1px solid #ddd;
+			padding: 8px;
+		}
+
+		#userstbl tr:nth-child(even){background-color: #f2f2f2;opacity: 0.9;}
+		#userstbl tr:nth-child(odd){background-color: #aba9a6;opacity: 0.8;}
+
+		#userstbl tr:hover {background-color: #ddd;}
+
+		#userstbl th {
+			padding-top: 12px;
+			padding-bottom: 12px;
+			text-align: left;
+			background-color: #4CAF50;
+			color: white;
+		}
+    </style> 
+</head> 
+<body>
+
+<div id="normalFont">
 <H3>
 	<a href="http://localhost:3001/" >Users&nbsp;|</a>
 	<a href="http://localhost:3001/books" >Books</a>
 </h3>
 <h3>Add User</h3>
+
 <form method="post" action="/users/add">
-	<input type="text" name="userid" placeholder="User ID">
-	<input type="text" name="firstname" placeholder="firstname">
-	<input type="text" name="lastname" placeholder="lastname">
-	<input type="text" name="username" placeholder="username">
-	<input type="text" name="email" placeholder="email">
-	<input type="text" name="admin" placeholder="admin">
+	<input type="text" name="userid" placeholder="User ID" Required>
+	<input type="text" name="firstname" placeholder="firstname" Required>
+	<input type="text" name="lastname" placeholder="lastname" Required>
+	<input type="text" name="username" placeholder="username" Required>
+	<input type="text" name="email" placeholder="email" Required>
+	<select name="admin" Required>
+		<option value="">Select Role</option>
+		<option value="Admin">Admin</option>
+		<option value="Librarian">Librarian</option>
+		<option value="Reader">Reader</option>
+	</select>
 	<input type="submit" value="submit">
 </form>
-<h3>Users</h3>
-<table border="4">
+	<h3>Users</h3>
+	</div>
+<table id="userstbl">
 	<tr>
 		<th>User ID</th>
-		<th>firstname</th>
-		<th>lastname</th>
-		<th>username</th>
-		<th>email</th>
-		<th>admin</th>
+		<th>First Name</th>
+		<th>Last Name</th>
+		<th>Username</th>
+		<th>Email</th>
+		<th>Role</th>
+		<th> </th>
+		<th> </th>
 	</tr>
+
 	<% users.forEach(function(user){ %>
 	<tr>
 		<form method="post" action="/users/update/<%= user.key %>">
-			<td><input type="text" name="userId" value="<%= user.value.userid %>"></td>
-			<td><input type="text" name="firstname" value="<%= user.value.firstname %>"></td>
-			<td><input type="text" name="lastname" value="<%= user.value.lastname %>"></td>
-			<td><input type="text" name="username" value="<%= user.value.username %>"></td>
-			<td><input type="text" name="email" value="<%= user.value.email %>"></td>
-			<td><input type="text" name="admin" value="<%= user.value.admin %>"></td>
+			<td><input type="text" name="userId" value="<%= user.value.userid %>" required></td>
+			<td><input type="text" name="firstname" value="<%= user.value.firstname %>" required></td>
+			<td><input type="text" name="lastname" value="<%= user.value.lastname %>" required></td>
+			<td><input type="text" name="username" value="<%= user.value.username %>" required></td>
+			<td><input type="text" name="email" value="<%= user.value.email %>" required></td>
+			<td>
+				<%if( user.value.admin == "Admin"){ %>
+					<select name="admin" value="<%= user.value.admin %>">
+						<option value="Admin" selected="selected">Admin</option>
+						<option value="Librarian">Librarian</option>
+						<option value="Reader">Reader</option>
+					</select>
+				<%}%>
+				<%if( user.value.admin == "Librarian"){ %>
+					<select name="admin" value="<%= user.value.admin %>">
+						<option value="Admin">Admin</option>
+						<option value="Librarian"selected="selected" >Librarian</option>
+						<option value="Reader">Reader</option>
+					</select>
+				<%}%>
+				<%if( user.value.admin == "Reader"){ %>
+					<select name="admin" value="<%= user.value.admin %>">
+						<option value="Admin">Admin</option>
+						<option value="Librarian">Librarian</option>
+						<option value="Reader" selected="selected">Reader</option>
+					</select>
+				<%}%>
+			</td>
 			<td>			
 				<input type="hidden" value="<%= user.value.rev %>" name="rev">
 				<input type="submit" value="Edit">
@@ -45,3 +143,6 @@
 	</tr>
 	<% }); %>
 </table>
+
+</body>
+</html>

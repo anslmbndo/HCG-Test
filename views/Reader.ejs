@@ -1,0 +1,452 @@
+ express = require('express');
+ bodyParser = require('body-parser');
+ path = require('path');
+ NodeCouchDb = require('node-couchdb');
+ couchdbIterator = require('couchdb-iterator');
+
+ couch = new NodeCouchDb({
+	auth: {
+		user:'admin',
+		password: '12345'
+	}
+});
+
+ dbName = 'users_tbl';
+ dbbooks = 'books_tbl';
+ dbcheckout = 'checkouttbl';
+ viewUrl = '_design/users/_view/all';
+ viewBooks = '_design/books/_view/all';
+ viewCheckout= '_design/checkout/_view/all';
+var userlogin;
+
+var regUserid;
+var regFirstname;
+var regLastname;
+var regUsername;
+var regEmail;
+
+var bookId;
+var	name;
+var category;
+var author;
+var publishDate;
+
+couch.listDatabases().then(function(dbs){
+	console.log(dbs);
+});
+
+ app = express();
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.get('/', function(req, res){ 
+	couch.get(dbName, viewUrl).then(
+		function(data, headers, status){
+			console.log(data.data.rows);
+			res.render('index',{users:data.data.rows});
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+	
+});
+
+app.post('/users/add', function(req, res){
+	 userid = req.body.userid;
+	 firstname = req.body.firstname;
+	 lastname = req.body.lastname;
+	 username = req.body.username;
+	 email = req.body.email;
+	 phone = req.body.phone;
+	 admin = req.body.admin;
+	
+	couch.uniqid().then(function(ids){
+		 id = ids[0];
+		
+		couch.insert(dbName,{
+			_id: id,
+			userid: userid,
+			firstname: firstname,
+			lastname: lastname,
+			username: username,
+			email: email,
+			phone: phone,
+			admin: admin
+		}).then(
+			function(data, headers, status){
+				res.redirect('/');
+			},
+			function(err){
+				res.send(err);
+			}
+		);
+	});
+});
+
+app.post('/users/delete/:id', function(req, res){
+	 id = req.params.id;
+	 rev = req.body.rev;
+	
+	couch.del(dbName, id, rev).then(
+		function(data, headers, status){
+				res.redirect('/');
+			},
+			function(err){
+				res.send(err);
+			}
+	);
+});
+
+app.post('/users/update/:id', function(req, res){
+	 id = req.params.id;
+	 rev = req.body.rev;
+	 userID = req.body.userId;
+	 firstname = req.body.firstname;
+	 lastname = req.body.lastname;
+	 username = req.body.username;
+	 email = req.body.email;
+	 phone = req.body.phone;
+	 admin = req.body.admin;
+
+	
+	couch.update(dbName,{
+		_id: id,
+		_rev: rev,
+		userid: userID,
+		firstname: firstname,
+		lastname: lastname,
+		username: username,
+		email: email,
+		phone: phone,
+		admin: admin
+	}).then(
+		function(data, headers, status){
+			res.redirect('/');
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+});
+
+
+app.get('/books', function(req, res){
+	couch.get(dbbooks, viewBooks).then(
+		function(data, headers, status){
+			console.log(data.data.rows);
+			res.render('books',{books:data.data.rows});
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+});
+
+
+
+/*app.post('/books/add', function(req, res){
+	 bookId = req.body.bookId;
+	 name = req.body.name;
+	 category = req.body.category;
+	 author = req.body.author;
+	 publishDate = req.body.publishDate;
+	
+	couch.uniqid().then(function(ids){
+		 id = ids[0];
+		
+		couch.insert(dbbooks,{
+			_id: id,
+			bookId: bookId,
+			name: name,
+			category: category,
+			author: author,
+			publishDate: publishDate
+		}).then(
+			function(data, headers, status){
+				res.redirect('/books');
+			},
+			function(err){
+				res.send(err);
+			}
+		);
+	});
+});*/
+
+app.post('/books/delete/:id', function(req, res){
+	 id = req.params.id;
+	 rev = req.body.rev;
+	
+	couch.del(dbbooks, id, rev).then(
+		function(data, headers, status){
+				res.redirect('/books');
+			},
+			function(err){
+				res.send(err);
+			}
+	);
+});
+
+app.post('/books/update/:id', function(req, res){
+	 id = req.params.id;
+	 rev = req.body.rev;
+	 bookId = req.body.bookId;
+	 name = req.body.name;
+	 category = req.body.category;
+	 author = req.body.author;
+	 publishDate = req.body.publishDate;
+	
+	couch.update(dbbooks,{
+		_id: id,
+		_rev: rev,
+		bookId: bookId,
+		name: name,
+		category: category,
+		author: author,
+		publishDate: publishDate
+	}).then(
+		function(data, headers, status){
+			res.redirect('/books');
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+});
+
+app.get('/login', function(req, res){
+	res.render('login');
+});
+
+app.post('/login/redirect', function(req, res){
+	userlogin = req.body.username;	
+	res.redirect('/login/success');
+});
+
+
+app.get('/login/success', function(req, res){ 
+	couch.get(dbName, viewUrl).then(
+		function(data, headers, status){
+			
+			//username = req.body.username;	
+			couchdbIterator('http://localhost:5984/users_tbl', 'users/all?include_docs=true', (row, index) => {
+				console.log(index, row.id, row.key, row.value);
+				
+				console.log("current username: " + userlogin);
+				console.log("row username: " + row.value.username);
+				if(userlogin==row.value.username){
+					
+					if(row.value.admin == 'Admin'){
+						res.render('index',{users:data.data.rows});
+					}
+					else if(row.value.admin == 'Librarian'){
+						//res.render('lib-books',{users:data.data.rows});
+						res.redirect('/lib-books');
+					}
+					else{
+						res.redirect('/lib-Reader');
+					}
+				}
+			})
+			.then((rowsCount) => {
+				console.log(`Iteration completed! ${rowsCount}`);
+			}, (err) => {
+				console.log('Iteration failed', err);
+			});
+
+
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+	
+});
+
+
+app.get('/Register', function(req, res){
+	res.render('Register');
+});
+
+app.post('/users/register', function(req, res){
+	regFirstname = req.body.firstname;
+	regLastname = req.body.lastname;
+	regUsername = req.body.username;
+	regEmail = req.body.email;;
+	res.redirect('/users/register/process');
+});
+
+app.get('/users/register/process', function(req, res){ 
+	couch.get(dbName, viewUrl).then(
+		function(data, headers, status){
+			
+			
+			couchdbIterator('http://localhost:5984/users_tbl', 'users/all?include_docs=true', (row, index) => {
+				console.log(index, row.id, row.key, row.value);
+				
+				console.log("row userid: " + row.value.userid);
+				regUserid = row.value.userid;
+				
+			})
+			.then((rowsCount) => {
+				console.log(`Iteration completed! ${rowsCount}`);
+				var lastFive = regUserid.substr(regUserid.length - 5);
+				var five = parseInt(lastFive);
+				console.log("last five digits: " + lastFive);
+				var newfive = five+1;
+				console.log("plus 1 = " + newfive);
+				lastFive = newfive.toString().padStart(5, "0");
+				console.log("new last five digits: " + lastFive);
+				
+				regUserid = regUsername + "-" + lastFive;
+				console.log("new userID to be registered: " + regUserid);
+				res.redirect('/users/register/processed');
+				
+			}, (err) => {
+				console.log('Iteration failed', err);
+			});
+
+
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+	
+});
+
+app.get('/users/register/processed', function(req, res){
+	
+	couch.uniqid().then(function(ids){
+		 id = ids[0];
+		
+		couch.insert(dbName,{
+			_id: id,
+			userid: regUserid,
+			firstname: regFirstname,
+			lastname: regLastname,
+			username: regUsername,
+			email: regEmail,
+			admin: "Reader"
+		}).then(
+			function(data, headers, status){
+				res.render('login');
+			},
+			function(err){
+				res.send(err);
+			}
+		);
+	});
+});
+
+
+app.post('/books/add', function(req, res){
+	name = req.body.name;
+	category = req.body.category;
+	author = req.body.author;
+	publishDate = req.body.publishDate;
+	res.redirect('/books/add/process');
+});
+
+app.get('/books/add/process', function(req, res){ 
+	couch.get(dbName, viewUrl).then(
+		function(data, headers, status){
+			
+			
+			couchdbIterator('http://localhost:5984/books_tbl', 'books/all?include_docs=true', (row, index) => {
+				console.log(index, row.id, row.key, row.value);
+				
+				console.log("row bookid: " + row.value.bookId);
+				bookid = row.value.bookId;
+				
+			})
+			.then((rowsCount) => {
+				console.log(`Iteration completed! ${rowsCount}`);
+				var lastISBN = bookid.substr(bookid.length - 17);
+				lastISBN = lastISBN.replace(/-/g,'');
+				var lastISBN = parseInt(lastISBN);
+				var newISBN = lastISBN+1;
+				lastISBN = newISBN.toString().padStart(13, "0");
+				lastISBN = lastISBN.toString();
+				var isbn1 = lastISBN.substring(0, 3);
+				var isbn2 = lastISBN.substring(3, 4);
+				var isbn3 = lastISBN.substring(4, 6);
+				var isbn4 = lastISBN.substring(6, 12);
+				var isbn5 = lastISBN.substring(12, 13);
+				newISBN = category+"-"+isbn1+"-"+isbn2+"-"+isbn3+"-"+isbn4+"-"+isbn5;
+				console.log("ISBN : " + isbn1 + " " + isbn2 + " " + isbn3 + " " + isbn4 + " " + isbn4);
+				console.log(newISBN);
+				bookid = newISBN;
+				console.log("bookid:"+ bookid + " name:" + name + " category:" + category + " author:" + author + " publishdate:" + publishDate )
+				console.log("ISBN : " + lastISBN);
+				res.redirect('/books/add/processed');
+			}, (err) => {
+				console.log('Iteration failed', err);
+			});
+
+
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+	
+});
+
+
+app.get('/books/add/processed', function(req, res){
+	
+	
+	couch.uniqid().then(function(ids){
+		 id = ids[0];
+		
+		couch.insert(dbbooks,{
+			_id: id,
+			bookId: bookid,
+			name: name,
+			category: category,
+			author: author,
+			publishDate: publishDate
+		}).then(
+			function(data, headers, status){
+				res.redirect('/books');
+			},
+			function(err){
+				res.send(err);
+			}
+		);
+	});
+});
+
+app.get('/lib-books', function(req, res){
+	couch.get(dbbooks, viewBooks).then(
+		function(data, headers, status){
+			console.log(data.data.rows);
+			res.render('lib-books',{books:data.data.rows});
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+});
+
+app.get('/lib-Reader', function(req, res){
+	couch.get(dbbooks, viewBooks).then(
+		function(data, headers, status){
+			console.log(data.data.rows);
+			res.render('lib-Reader',{books:data.data.rows});
+		},
+		function(err){
+			res.send(err);
+		}
+	);
+});
+
+app.listen(3001, function(){
+	console.log('Server started on Port 3001');
+});
+
